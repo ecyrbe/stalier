@@ -1,7 +1,6 @@
- <h1 align="center">Stalier</h1>
  <p align="center">
    <a href="https://github.com/ecyrbe/stalier">
-     <img align="center" src="https://raw.githubusercontent.com/ecyrbe/stalier/main/docs/logo.png" width="128px" alt="Stalier logo">
+     <img align="center" src="https://raw.githubusercontent.com/ecyrbe/stalier/main/docs/logo.png" width="256px" alt="Stalier logo">
    </a>
  </p>
  <p align="center">
