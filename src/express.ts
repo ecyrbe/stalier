@@ -23,7 +23,7 @@ export const stalier: (options: StalierMiddlewareOptions) => RequestHandler =
         const maxAge = parseInt(matched[1]);
         const staleWhileRevalidate = matched[4] ? parseInt(matched[4]) : 0;
         const send = res.send.bind(res);
-        const cacheResult = new Promise<{ data: Buffer | string; statusCode: number; headers: OutgoingHttpHeaders }>(
+        const freshResult = new Promise<{ data: Buffer | string; statusCode: number; headers: OutgoingHttpHeaders }>(
           resolve => {
             res.send = function (data) {
               resolve({ data, statusCode: this.statusCode, headers: this.getHeaders() });
@@ -34,7 +34,7 @@ export const stalier: (options: StalierMiddlewareOptions) => RequestHandler =
         const result = withStaleWhileRevalidate(
           () => {
             next();
-            return cacheResult;
+            return freshResult;
           },
           {
             maxAge,
