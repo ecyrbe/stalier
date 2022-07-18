@@ -103,7 +103,7 @@ describe('stalier-express', () => {
       updatedCount: count++,
       lastUpdated: Date.now() - 500,
       value: {
-        data: JSON.stringify({ hello: `cachedValue${count}` }),
+        data: JSON.stringify({ hello: 'cachedValue' }),
         statusCode: 200,
         headers: { 'content-type': 'application/json' },
       },
@@ -117,11 +117,11 @@ describe('stalier-express', () => {
     const results = await Promise.all(promises);
     expect(results.length).toBe(10);
     expect(fakeCache.get().updatedCount).toBe(10);
-    results.forEach((result, index) => {
+    results.forEach(result => {
       expect(result.statusCode).toBe(200);
       expect(result.headers['content-type']).toMatch('application/json');
       expect(result.headers['x-cache-status']).toEqual('HIT');
-      expect(result.body).toEqual({ hello: `cachedValue${index + 1}` });
+      expect(result.body).toEqual({ hello: 'cachedValue' });
     });
   });
 
