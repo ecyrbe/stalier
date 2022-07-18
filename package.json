@@ -17,6 +17,11 @@
     "email": "ecyrbe@gmail.com"
   },
   "license": "MIT",
+  "keywords": [
+    "stale-while-revalidate",
+    "cache",
+    "express"
+  ],
   "scripts": {
     "prebuild": "rimraf lib",
     "build": "tsc -p tsconfig.build.json",
