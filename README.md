@@ -24,9 +24,9 @@ Stalier is cache strategy middleware controled by your frontend by using `x-stal
 It is an advanced middleware that can be used to cache your backend responses with support for stale-while-revalidate strategy.  
 Stalier will act as a proxy to your routes and cache the response if front-end asks for it.  
 Since it's embedded in your backend, it's much more efficient than using a separate proxy.  
-It implements part of RFC7234  and RFC5861 but on the backend. It does not use `cache-control` header to not allow the browser to interfere with it.  
-If you want both your browser to cache the response the response and if not present cache on the backend, you can use `x-stalier-cache-control` and `cache-control` headers at the same time.  
-  
+It implements part of RFC7234 and RFC5861 but on the backend. It does not use `cache-control` header to not allow the browser to interfere with it.  
+If you want both your browser to cache the response the response and if not present cache on the backend, you can use `x-stalier-cache-control` and `cache-control` headers at the same time.
+
 ## INSTALL
 
 ```bash
@@ -55,7 +55,7 @@ var redisCache = cacheManager.caching({ store: redisStore });
 // Create a new express app
 const app = express();
 // add stalier middleware
-app.use(stalier({ prefixCache: 'test', cacheClient: redisCache }));
+app.use(stalier({ cachePrefix: 'test', cacheClient: redisCache }));
 ```
 
 ## Header `x-stalier-cache-control` params
