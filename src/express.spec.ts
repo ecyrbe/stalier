@@ -7,6 +7,10 @@ const fakeCache = {
   set: jest.fn(),
 };
 
+const errorInterceptor: express.ErrorRequestHandler = (err, req, res, next) => {
+  return res.status(500).json({ error: err.message });
+};
+
 describe('stalier-express', () => {
   // setup a server with stalier middleware
   let app: express.Express;
@@ -22,6 +26,10 @@ describe('stalier-express', () => {
       await new Promise(resolve => setTimeout(resolve, Math.floor(Math.random() * 100)));
       res.json({ hello: 'world' });
     });
+    app.get('/error', async (req, res, next) => {
+      next(new Error('backend error'));
+    });
+    app.use(errorInterceptor);
   });
 
   afterEach(() => {
@@ -77,6 +85,24 @@ describe('stalier-express', () => {
     expect(result.headers['content-type']).toMatch('application/json');
     expect(result.headers['x-cache-status']).toEqual('NO_CACHE');
     expect(result.body).toEqual({ hello: 'world' });
+  });
+
+  it('should not cache errors', async () => {
+    fakeCache.get.mockReturnValue({
+      updatedCount: 0,
+      lastUpdated: Date.now() - 2000,
+      value: {
+        data: 'cachedValue',
+        statusCode: 200,
+        headers: { 'content-type': 'text/html' },
+      },
+    });
+    const result = await request(app).get('/error').set(STALIER_HEADER_KEY, 's-maxage=1, stale-while-revalidate=1');
+    expect(result.statusCode).toBe(500);
+    expect(result.headers['content-type']).toMatch('application/json');
+    expect(result.headers['x-cache-status']).toEqual('NO_CACHE');
+    expect(fakeCache.set).not.toHaveBeenCalled();
+    expect(result.body).toEqual({ error: 'backend error' });
   });
 
   it('should return cachedValue with maxAge=1', async () => {

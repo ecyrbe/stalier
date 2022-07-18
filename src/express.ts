@@ -24,9 +24,13 @@ export const stalier: (options: StalierMiddlewareOptions) => RequestHandler =
         const staleWhileRevalidate = matched[4] ? parseInt(matched[4]) : 0;
         const send = res.send.bind(res);
         const freshResult = new Promise<{ data: Buffer | string; statusCode: number; headers: OutgoingHttpHeaders }>(
-          resolve => {
+          (resolve, reject) => {
             res.send = function (data) {
-              resolve({ data, statusCode: this.statusCode, headers: this.getHeaders() });
+              if (this.statusCode >= 200 && this.statusCode <= 300) {
+                resolve({ data, statusCode: this.statusCode, headers: this.getHeaders() });
+              } else {
+                reject({ data, statusCode: this.statusCode, headers: this.getHeaders() });
+              }
               return this;
             };
           },
@@ -44,14 +48,29 @@ export const stalier: (options: StalierMiddlewareOptions) => RequestHandler =
             logger,
           },
         );
-        return result.then(({ data, status }) => {
-          res.status(data.statusCode);
-          if (data.headers) {
-            res.set(data.headers);
-          }
-          res.set('X-Cache-Status', status);
-          send(data.data);
-        });
+        return result
+          .then(({ data, status }) => {
+            res.status(data.statusCode);
+            if (data.headers) {
+              res.set(data.headers);
+            }
+            res.set('X-Cache-Status', status);
+            send(data.data);
+          })
+          .catch(reason => {
+            if (reason.data && reason.statusCode) {
+              res.status(reason.statusCode);
+              if (reason.headers) {
+                res.set(reason.headers);
+              }
+              res.set('X-Cache-Status', 'NO_CACHE');
+              send(reason.data);
+            } else {
+              res.status(500);
+              res.set('X-Cache-Status', 'NO_CACHE');
+              send(JSON.stringify({ error: 'Unexpected error' }));
+            }
+          });
       }
     }
     res.set('X-Cache-Status', 'NO_CACHE');
