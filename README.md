@@ -21,11 +21,12 @@
  </p>
 
 Stalier is cache strategy middleware controled by your frontend by using `x-stalier-cache-control` header.  
-It is an advanced middleware that can be used to cache your backend responses with support for stale-while-revalidate strategy.  
-Stalier will act as a proxy to your routes and cache the response if front-end asks for it.  
+This means that instead of your backend sending `Cache-Control` header to your browser for your browser to cache the returned data, your frontend will send the header `X-Stalier-Cache-Control` to your backend for it to cache the returned data from your source of truth.
+It is an advanced middleware that with support for stale-while-revalidate strategy.  
+Stalier will act as a proxy for your routes and cache the response if front-end asks for it.  
 Since it's embedded in your backend, it's much more efficient than using a separate proxy.  
-It implements part of RFC7234 and RFC5861 but on the backend. It does not use `cache-control` header to not allow the browser to interfere with it.  
-If you want both your browser to cache the response the response and if not present cache on the backend, you can use `x-stalier-cache-control` and `cache-control` headers at the same time.
+It implements part of RFC7234 and RFC5861 but on the backend. It does not use `cache-control` since the cache is controlled by the frontend.
+If you want both your browser and backend to cache the responses, you can use `x-stalier-cache-control` for requests and `cache-control` for responses at the same time.
 
 ## INSTALL
 
@@ -56,6 +57,34 @@ var redisCache = cacheManager.caching({ store: redisStore });
 const app = express();
 // add stalier middleware
 app.use(stalier({ cachePrefix: 'test', cacheClient: redisCache }));
+```
+
+## Stalier Options
+
+```typescript
+type StalierMiddlewareOptions = {
+  /**
+   * name of the upstream application
+   */
+  appName: string;
+  /**
+   * client to use for caching
+   * should have an async `get` method and `set` method
+   */
+  cacheClient: CacheClient;
+  /**
+   * function to generate a cache key per request
+   * Use a custom one to handle per user caching
+   * @default `<appName>-<HTTP Verb>-<path>`
+   */
+  cacheKeyGen?: (req: Request) => string;
+  /**
+   * logger to use for logging
+   * should have a log, warn and error method that takes a message parameter
+   * @default `console`
+   */
+  logger?: Logger;
+};
 ```
 
 ## Header `x-stalier-cache-control` params

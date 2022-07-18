@@ -17,7 +17,7 @@ describe('stalier-express', () => {
 
   beforeAll(() => {
     app = express();
-    app.use(stalier({ cachePrefix: 'test', cacheClient: fakeCache }));
+    app.use(stalier({ appName: 'test', cacheClient: fakeCache }));
     app.get('/string', async (req, res) => {
       await new Promise(resolve => setTimeout(resolve, Math.floor(Math.random() * 100)));
       res.send('hello');
