@@ -1,7 +1,7 @@
 import type { RequestHandler, Request } from 'express';
 import type { OutgoingHttpHeaders } from 'http';
-import { withStaleWhileRevalidate } from './stalier';
-import { StalierOptions } from './stalier.types';
+import { withStaleWhileRevalidate } from '../stalier';
+import { StalierOptions } from '../stalier.types';
 
 export const STALIER_HEADER_KEY = 'X-Stalier-Cache-Control';
 

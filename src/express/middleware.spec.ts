@@ -1,6 +1,6 @@
 import express from 'express';
 import request from 'supertest';
-import { stalier, STALIER_HEADER_KEY } from './express';
+import { stalier, STALIER_HEADER_KEY } from './middleware';
 
 const fakeCache = {
   get: jest.fn(),
