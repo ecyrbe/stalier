@@ -41,6 +41,9 @@ const defaultKeyGenerator = (name: string) => (req: Request) => {
  * @param options - options for stalier
  */
 export const stalier: (options: StalierMiddlewareOptions) => RequestHandler = options => (req, res, next) => {
+  if (req.method === 'OPTIONS' || req.method === 'HEAD') {
+    return next();
+  }
   const { cacheClient, cacheKeyGen = defaultKeyGenerator(options.appName), logger = console } = options;
   const cacheControl = req.get(STALIER_HEADER_KEY);
   if (cacheControl) {
