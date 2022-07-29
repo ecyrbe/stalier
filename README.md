@@ -52,7 +52,7 @@ import redisStore from 'cache-manager-ioredis';
 
 import { stalier } from 'stalier';
 
-var redisCache = cacheManager.caching({ store: redisStore });
+const redisCache = cacheManager.caching({ store: redisStore });
 
 // Create a new express app
 const app = express();
@@ -86,6 +86,37 @@ type StalierMiddlewareOptions = {
    */
   logger?: Logger;
 };
+```
+
+## Handle per user caching
+
+```js
+import express from 'express';
+import cacheManager from 'cache-manager';
+import redisStore from 'cache-manager-ioredis';
+import jsonwebtoken from 'jsonwebtoken';
+import { stalier } from 'stalier';
+
+// your user middleware
+import { userMiddleware } from './userMiddleware';
+
+const redisCache = cacheManager.caching({ store: redisStore });
+
+const appName = 'test';
+// cache key per user request that extracts the user email from your user middleware
+const cacheKeyGen = (req: Request) => {
+  if(req.user) {
+    return `${appName}-${req.method}-${req.path}-${req.user.email}`;
+  }
+  return `${appName}-${req.method}-${req.path}`;
+}
+
+app.use(userMiddleware);
+app.use(stalier({
+  appName,
+  cacheClient: redisCache,
+  cacheKeyGen,
+}));
 ```
 
 ## Header `x-stalier-cache-control` params
