@@ -1,6 +1,7 @@
 import express from 'express';
 import request from 'supertest';
-import { stalier, STALIER_HEADER_KEY } from './middleware';
+import { stalier } from './middleware';
+import { STALIER_HEADER_KEY } from '../common/constants';
 
 const fakeCache = {
   get: jest.fn(),
@@ -44,19 +45,19 @@ describe('stalier-express', () => {
     const result = await request(app).get('/string');
     expect(result.statusCode).toBe(200);
     expect(result.headers['content-type']).toMatch('text/html');
-    expect(result.headers['x-cache-status']).toEqual('NO_CACHE');
+    expect(result.headers['x-cache-status']).toBeUndefined();
     expect(result.text).toBe('hello');
   });
   it('should return object with no maxAge and no staleWileRevalidate', async () => {
     const result = await request(app).get('/object');
     expect(result.statusCode).toBe(200);
     expect(result.headers['content-type']).toMatch('application/json');
-    expect(result.headers['x-cache-status']).toEqual('NO_CACHE');
+    expect(result.headers['x-cache-status']).toBeUndefined();
     expect(result.body).toEqual({ hello: 'world' });
   });
 
   it('should return hello with maxAge=0 and no staleWileRevalidate', async () => {
-    const result = await request(app).get('/string').set('X-Stale-Cache-Control', 's-maxage=0');
+    const result = await request(app).get('/string').set(STALIER_HEADER_KEY, 's-maxage=0');
     expect(result.statusCode).toBe(200);
     expect(result.headers['content-type']).toMatch('text/html');
     expect(result.headers['x-cache-status']).toEqual('NO_CACHE');
@@ -64,7 +65,7 @@ describe('stalier-express', () => {
   });
 
   it('should return object with maxAge=0 and no staleWileRevalidate', async () => {
-    const result = await request(app).get('/object').set('X-Stale-Cache-Control', 's-maxage=0');
+    const result = await request(app).get('/object').set(STALIER_HEADER_KEY, 's-maxage=0');
     expect(result.statusCode).toBe(200);
     expect(result.headers['content-type']).toMatch('application/json');
     expect(result.headers['x-cache-status']).toEqual('NO_CACHE');

@@ -1,11 +1,9 @@
 import type { RequestHandler, Request } from 'express';
 import type { OutgoingHttpHeaders } from 'http';
+import { MATCH_HEADER, STALIER_HEADER_KEY } from '../common/constants';
+import { defaultKeyGenerator } from '../common/utils';
 import { withStaleWhileRevalidate } from '../stalier';
 import { StalierOptions } from '../stalier.types';
-
-export const STALIER_HEADER_KEY = 'X-Stalier-Cache-Control';
-
-const MATCH_HEADER = /s-maxage=([0-9]+)(\s*,\s*(stale-while-revalidate=([0-9]+)))?/;
 
 export type StalierMiddlewareOptions = {
   /**
@@ -30,18 +28,11 @@ export type StalierMiddlewareOptions = {
 };
 
 /**
- * default cache key generator
- */
-const defaultKeyGenerator = (name: string) => (req: Request) => {
-  return `${name}-${req.method}-${req.originalUrl}`;
-};
-
-/**
  * middleware to cache responses
  * @param options - options for stalier
  */
 export const stalier: (options: StalierMiddlewareOptions) => RequestHandler = options => (req, res, next) => {
-  if (req.method === 'OPTIONS' || req.method === 'HEAD') {
+  if (!['GET', 'POST'].includes(req.method)) {
     return next();
   }
   const { cacheClient, cacheKeyGen = defaultKeyGenerator(options.appName), logger = console } = options;
@@ -101,7 +92,7 @@ export const stalier: (options: StalierMiddlewareOptions) => RequestHandler = op
           }
         });
     }
+    res.set('X-Cache-Status', 'NO_CACHE');
   }
-  res.set('X-Cache-Status', 'NO_CACHE');
   next();
 };
