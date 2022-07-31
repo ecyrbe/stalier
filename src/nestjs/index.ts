@@ -1,2 +1,2 @@
-export * from './decorators';
-export * from './interceptor';
+export * from './stalier.decorators';
+export * from './stalier.interceptor';

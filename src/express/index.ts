@@ -1,1 +1,1 @@
-export * from './middleware';
+export * from './stalier.middleware';

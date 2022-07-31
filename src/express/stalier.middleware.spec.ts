@@ -1,6 +1,6 @@
 import express from 'express';
 import request from 'supertest';
-import { stalier } from './middleware';
+import { stalier } from './stalier.middleware';
 import { STALIER_HEADER_KEY } from '../common/constants';
 
 const fakeCache = {

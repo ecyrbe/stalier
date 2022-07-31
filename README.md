@@ -125,9 +125,26 @@ Stalier uses the `NestJsInterceptor` to intercept the request and response, and 
 
 ```typescript
 import { Controller, Get } from '@nestjs/common';
-import { UseStalierInterceptor, UseCacheKeyGen } from 'stalier';
+import { UseStalierInterceptor, StalierModule, UseCacheKeyGen } from 'stalier';
 
-@UseStalierInterceptor({ appName: 'myApp' })
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    StalierModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        appName: 'test',
+        cacheOptions: configService.get('CACHE_OPTIONS'),
+        isGlobal: true,
+      }),
+      inject: [ConfigService],
+    }),
+  ],
+  controllers: [MyAppController],
+})
+
+@UseStalierInterceptor()
 @Controller()
 class MyAppController {
   @Get('/default-kay')

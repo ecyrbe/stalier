@@ -1,11 +1,13 @@
-import { CACHE_MANAGER, Controller, Get, INestApplication } from '@nestjs/common';
+import { Controller, Get, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { STALIER_HEADER_KEY } from '../common/constants';
-import { UseStalierInterceptor, UseCacheKeyGen } from './decorators';
+import { STALIER_CACHE_MANAGER } from './stalier.constants';
+import { UseStalierInterceptor, UseCacheKeyGen } from './stalier.decorators';
+import { StalierModule } from './stalier.module';
 
 // declare a fake controller to test the interceptor
-@UseStalierInterceptor({ appName: 'test' })
+@UseStalierInterceptor()
 @Controller()
 class TestController {
   @Get('/string')
@@ -41,10 +43,23 @@ describe('StalierInterceptor', () => {
 
   beforeAll(async () => {
     const module = await Test.createTestingModule({
+      imports: [
+        StalierModule.forRootAsync({
+          useFactory: () => ({
+            appName: 'test',
+            cacheOptions: {
+              store: 'memory',
+              max: 1000,
+              ttl: 60,
+            },
+          }),
+          inject: [],
+        }),
+      ],
       controllers: [TestController],
       providers: [
         {
-          provide: CACHE_MANAGER,
+          provide: STALIER_CACHE_MANAGER,
           useValue: fakeCache,
         },
       ],

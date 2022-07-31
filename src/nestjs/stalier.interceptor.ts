@@ -1,17 +1,20 @@
-import { CACHE_MANAGER, CallHandler, ExecutionContext, Inject, Injectable, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Inject, Injectable, NestInterceptor } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request, Response } from 'express';
 import { lastValueFrom, of } from 'rxjs';
 import { Cache } from 'cache-manager';
 import { withStaleWhileRevalidate } from '../stalier';
-import { MATCH_HEADER, STALIER_APP_NAME, STALIER_CACHE_KEY_GEN, STALIER_HEADER_KEY } from '../common/constants';
+import { MATCH_HEADER, STALIER_HEADER_KEY } from '../common/constants';
+import { STALIER_CACHE_KEY_GEN, STALIER_OPTIONS, STALIER_CACHE_MANAGER } from './stalier.constants';
 import { defaultKeyGenerator } from '../common/utils';
 import { KeyGenFn } from '../common/types';
+import { StalierModuleOptions } from './stalier.interfaces';
 
 @Injectable()
 export class StalierInterceptor implements NestInterceptor {
   constructor(
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @Inject(STALIER_CACHE_MANAGER) private readonly cacheManager: Cache,
+    @Inject(STALIER_OPTIONS) private readonly options: StalierModuleOptions,
     @Inject('Reflector') private readonly reflector: Reflector,
   ) {}
 
@@ -47,13 +50,10 @@ export class StalierInterceptor implements NestInterceptor {
 
   protected getKeyGen(context: ExecutionContext): KeyGenFn {
     const keyGen =
-      this.reflector.get<KeyGenFn>(STALIER_CACHE_KEY_GEN, context.getHandler()) ||
-      this.reflector.get<KeyGenFn>(STALIER_CACHE_KEY_GEN, context.getClass());
-    const appName =
-      this.reflector.get<string>(STALIER_APP_NAME, context.getClass()) ||
-      `${context.getClass().name}-${context.getHandler().name}`;
+      this.reflector.get<KeyGenFn>(STALIER_CACHE_KEY_GEN, context.getHandler()) || this.options.cacheKeyGen;
+    const appName = this.options.appName || `${context.getClass().name}-${context.getHandler().name}`;
     if (keyGen) {
-      return (req: Request) => `${appName}-${keyGen(req)}`;
+      return req => `${appName}-${keyGen(req)}`;
     }
     return defaultKeyGenerator(appName);
   }
