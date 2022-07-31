@@ -41,7 +41,7 @@ or
 yarn add stalier
 ```
 
-## USAGE
+## USAGE : Express
 
 Stalier do not provide a cache on it's own, nor does it provide a logger. But you provide them both in the constructor.
 
@@ -117,6 +117,28 @@ app.use(stalier({
   cacheClient: redisCache,
   cacheKeyGen,
 }));
+```
+
+## USAGE : NestJS
+
+Stalier uses the `NestJsInterceptor` to intercept the request and response, and uses the Cache Module to cache the response.
+
+```typescript
+// declare a fake controller to test the interceptor
+@UseStalierInterceptor({ appName: 'myApp' })
+@Controller()
+class MyAppController {
+  @Get('/default-kay')
+  getDefaultKey() {
+    return { hello: 'world' };
+  }
+
+  @UseCacheKeyGen(() => 'test')
+  @Get('/custom-key')
+  getCustomKey() {
+    return { hello: 'world' };
+  }
+}
 ```
 
 ## Header `x-stalier-cache-control` params
