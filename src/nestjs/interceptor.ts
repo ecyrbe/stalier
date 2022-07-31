@@ -6,8 +6,7 @@ import { Cache } from 'cache-manager';
 import { withStaleWhileRevalidate } from '../stalier';
 import { MATCH_HEADER, STALIER_APP_NAME, STALIER_CACHE_KEY_GEN, STALIER_HEADER_KEY } from '../common/constants';
 import { defaultKeyGenerator } from '../common/utils';
-
-type KeyGenFn = (req: Request) => string;
+import { KeyGenFn } from '../common/types';
 
 @Injectable()
 export class StalierInterceptor implements NestInterceptor {
