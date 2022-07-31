@@ -20,7 +20,8 @@
   "keywords": [
     "stale-while-revalidate",
     "cache",
-    "express"
+    "express",
+    "nestjs"
   ],
   "scripts": {
     "prebuild": "rimraf lib",

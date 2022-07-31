@@ -124,7 +124,9 @@ app.use(stalier({
 Stalier uses the `NestJsInterceptor` to intercept the request and response, and uses the Cache Module to cache the response.
 
 ```typescript
-// declare a fake controller to test the interceptor
+import { Controller, Get } from '@nestjs/common';
+import { UseStalierInterceptor, UseCacheKeyGen } from 'stalier';
+
 @UseStalierInterceptor({ appName: 'myApp' })
 @Controller()
 class MyAppController {
