@@ -1,5 +1,6 @@
 import { Controller, Get, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { Cache } from 'cache-manager';
 import request from 'supertest';
 import { STALIER_HEADER_KEY } from '../common/constants';
 import { STALIER_CACHE_MANAGER } from './stalier.constants';
@@ -35,11 +36,14 @@ class TestController {
 const fakeCache = {
   get: jest.fn(),
   set: jest.fn(),
+  del: jest.fn(),
+  reset: jest.fn(),
 };
 
 describe('StalierInterceptor', () => {
   let app: INestApplication;
   let controller: TestController;
+  let cache: Cache;
 
   beforeAll(async () => {
     const module = await Test.createTestingModule({
@@ -49,30 +53,31 @@ describe('StalierInterceptor', () => {
             appName: 'test',
             cacheOptions: {
               store: 'memory',
-              max: 1000,
-              ttl: 60,
+              max: 10000,
             },
           }),
           inject: [],
         }),
       ],
       controllers: [TestController],
-      providers: [
-        {
-          provide: STALIER_CACHE_MANAGER,
-          useValue: fakeCache,
-        },
-      ],
-    }).compile();
+    })
+      .overrideProvider(STALIER_CACHE_MANAGER)
+      .useValue(fakeCache)
+      .compile();
 
     app = module.createNestApplication();
     await app.init();
 
     controller = module.get(TestController);
+    cache = module.get<Cache>(STALIER_CACHE_MANAGER);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    cache.reset();
   });
 
   afterAll(async () => {
-    jest.clearAllMocks();
     await app.close();
   });
 

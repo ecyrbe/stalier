@@ -4,7 +4,7 @@ import { KeyGenFn } from '../common/types';
 export interface StalierCacheManagerOptions {
   store: 'memory' | 'none' | CacheStore | CacheStoreFactory;
   max?: number;
-  ttl: number;
+  ttl?: number;
 }
 
 export interface StalierModuleOptions {
