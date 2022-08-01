@@ -147,13 +147,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 @UseStalierInterceptor()
 @Controller()
 class MyAppController {
-  @Get('/default-kay')
+  @Get('/default-key')
   getDefaultKey() {
     return { hello: 'world' };
   }
 
   // per user caching
-  @CacheKeyUser((res) => req.user.id)
+  @CacheKeyUser((req) => req.user.id)
   @Get('/custom-key')
   getCustomKey() {
     return { hello: 'world' };
@@ -161,6 +161,9 @@ class MyAppController {
 }
 ```
 
+By default, stalier interceptor will use the request path as the cache key.  
+To handle per user caching, you can use the `CacheKeyUser` decorator. You can apply it per controller or per method.  
+To apply a static key, use the `CacheKey` decorator. Or to have fine grained control, you can use the `CacheKeyGen` decorator.
 ## Header `x-stalier-cache-control` params
 
 Stalier is using the `x-stalier-cache-control` header to control the cache behaviour.
