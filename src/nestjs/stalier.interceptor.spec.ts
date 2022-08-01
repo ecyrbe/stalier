@@ -1,11 +1,31 @@
-import { Controller, Get, INestApplication } from '@nestjs/common';
+import {
+  CanActivate,
+  Controller,
+  ExecutionContext,
+  Get,
+  INestApplication,
+  Injectable,
+  UseGuards,
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 import { Cache } from 'cache-manager';
 import request from 'supertest';
 import { STALIER_HEADER_KEY } from '../common/constants';
 import { STALIER_CACHE_MANAGER } from './stalier.constants';
-import { UseStalierInterceptor, UseCacheKeyGen } from './stalier.decorators';
+import { UseStalierInterceptor, CacheKeyUser } from './stalier.decorators';
 import { StalierModule } from './stalier.module';
+
+@Injectable()
+export class UserGuard implements CanActivate {
+  constructor(private reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest();
+    request.user = { name: 'test' };
+    return true;
+  }
+}
 
 // declare a fake controller to test the interceptor
 @UseStalierInterceptor()
@@ -21,7 +41,8 @@ class TestController {
     return { hello: 'world' };
   }
 
-  @UseCacheKeyGen(() => 'test')
+  @UseGuards(UserGuard)
+  @CacheKeyUser((req: any) => req.user.name)
   @Get('/custom-key')
   getCustomKey() {
     return 'hello';
@@ -313,7 +334,7 @@ describe('StalierInterceptor', () => {
     expect(result.text).toBe('cachedValue');
     const resultSet = await promise;
     expect(resultSet).toEqual([
-      'test-test',
+      'test-test-GET-custom-key',
       {
         lastUpdated: expect.anything(),
         updatedCount: 1,

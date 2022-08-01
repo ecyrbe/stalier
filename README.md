@@ -106,7 +106,7 @@ const appName = 'test';
 // cache key per user request that extracts the user email from your user middleware
 const cacheKeyGen = (req: Request) => {
   if(req.user) {
-    return `${appName}-${req.method}-${req.path}-${req.user.email}`;
+    return `${appName}-${req.method}-${req.path}-${req.user.id}`;
   }
   return `${appName}-${req.method}-${req.path}`;
 }
@@ -152,7 +152,8 @@ class MyAppController {
     return { hello: 'world' };
   }
 
-  @UseCacheKeyGen(() => 'test')
+  // per user caching
+  @CacheKeyUser((res) => req.user.id)
   @Get('/custom-key')
   getCustomKey() {
     return { hello: 'world' };
