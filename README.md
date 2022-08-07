@@ -29,6 +29,18 @@ This means that instead of your backend sending `Cache-Control` header to your b
 - It implements part of RFC7234 and RFC5861 but on the backend. It does not use `cache-control` since the cache is controlled by the frontend.
 - If you want both your browser and backend to cache the responses, you can use `x-stalier-cache-control` for requests and `cache-control` for responses at the same time.
 
+- [INSTALL](#install)
+- [USAGE](#usage)
+  - [Express](#express)
+    - [Stalier Options](#stalier-options)
+    - [Handle per user caching](#handle-per-user-caching)
+  - [NestJS](#nestjs)
+    - [Create a Cache instance for StalierInterceptor](#create-a-cache-instance-for-stalierinterceptor)
+    - [Options for StalierModule](#options-for-staliermodule)
+    - [StalierInterceptor](#stalierinterceptor)
+- [Header `x-stalier-cache-control` params](#header-x-stalier-cache-control-params)
+- [Example](#example)
+
 ## INSTALL
 
 ```bash
@@ -40,8 +52,9 @@ or
 ```bash
 yarn add stalier
 ```
+## USAGE
 
-## USAGE : Express
+### Express
 
 Stalier do not provide a cache on it's own, nor does it provide a logger. But you provide them both in the constructor.
 
@@ -60,7 +73,7 @@ const app = express();
 app.use(stalier({ appName: 'test', cacheClient: redisCache }));
 ```
 
-## Stalier Options
+#### Stalier Options
 
 ```typescript
 type StalierMiddlewareOptions = {
@@ -88,7 +101,7 @@ type StalierMiddlewareOptions = {
 };
 ```
 
-## Handle per user caching
+#### Handle per user caching
 
 ```js
 import express from 'express';
@@ -119,11 +132,11 @@ app.use(stalier({
 }));
 ```
 
-## USAGE : NestJS
+### NestJS
 
 Stalier uses the `NestJsInterceptor` to intercept the request and response, and uses the Cache Module to cache the response.
 
-### Create a Cache instance for StalierInterceptor
+#### Create a Cache instance for StalierInterceptor
 
 Stalier module allows you to instanciate a Cache with the `cache-manager` library. The cacheOptions can take a single option or an array of options to use multicache strategy from `cache-manager`.
 Stalier module as two ways of instanciating a cache:
@@ -192,7 +205,7 @@ interface StalierCacheManagerOptions {
 }
 ```
 
-### StalierInterceptor
+#### StalierInterceptor
 
 You can load StalierInterceptor Globally (see useGlobalInterceptors) or per Controller (see useInterceptors).
 
