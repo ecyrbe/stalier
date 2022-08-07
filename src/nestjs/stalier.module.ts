@@ -1,5 +1,5 @@
 import { Module, DynamicModule, Provider, ConfigurableModuleAsyncOptions } from '@nestjs/common';
-import { caching, multiCaching, Cache, StoreConfig } from 'cache-manager';
+import { caching, multiCaching, StoreConfig } from 'cache-manager';
 import { STALIER_CACHE_MANAGER, STALIER_OPTIONS } from './stalier.constants';
 import { StalierModuleOptions } from './stalier.interfaces';
 
