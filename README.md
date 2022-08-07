@@ -123,6 +123,15 @@ app.use(stalier({
 
 Stalier uses the `NestJsInterceptor` to intercept the request and response, and uses the Cache Module to cache the response.
 
+### Create a Cache instance for StalierInterceptor
+
+Stalier module allows you to instanciate a Cache with the `cache-manager` library. The cacheOptions can take a single option or an array of options to use multicache strategy from `cache-manager`.
+Stalier module as two ways of instanciating a cache:
+- `forRoot` - with options known at compile time
+- `forRootAsync` - with options known at runtime, usually loaded from a config service
+  
+As the name suggests, your should only load Stalier module once in your application.
+  
 ```typescript
 import { Controller, Get } from '@nestjs/common';
 import { UseStalierInterceptor, StalierModule, UseCacheKeyGen } from 'stalier';
@@ -143,7 +152,51 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
   ],
   controllers: [MyAppController],
 })
+```
 
+#### Options for StalierModule
+
+```typescript
+
+interface StalierModuleOptions {
+  /**
+   * name of the app - used to generate cache key
+   */
+  appName: string;
+  /**
+   * function to generate cache key from a request
+   */
+  cacheKeyGen?: KeyGenFn;
+  /**
+   * options for cache-manager
+   */
+  cacheOptions: StalierCacheManagerOptions | StalierCacheManagerOptions[];
+  /**
+   * if true, stalier cache will be global and shared across all modules
+   */
+  isGlobal?: boolean;
+}
+interface StalierCacheManagerOptions {
+  /**
+   * cache-manager store to use
+   */
+  store: 'memory' | 'none' | CacheStore | CacheStoreFactory;
+  /**
+   * maximum number of items to store in the cache - only for memory cache
+   */
+  max?: number;
+  /**
+   * time to live in seconds - if not set no ttl is set by default
+   */
+  ttl?: number;
+}
+```
+
+### StalierInterceptor
+
+You can load StalierInterceptor Globally (see useGlobalInterceptors) or per Controller (see useInterceptors).
+
+```typescript
 @UseStalierInterceptor()
 @Controller()
 class MyAppController {
