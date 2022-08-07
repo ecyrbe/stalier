@@ -28,9 +28,10 @@ This means that instead of your backend sending `Cache-Control` header to your b
 - Since it's embedded in your backend, it's much more efficient than using a separate proxy.  
 - It implements part of RFC7234 and RFC5861 but on the backend. It does not use `cache-control` since the cache is controlled by the frontend.
 - If you want both your browser and backend to cache the responses, you can use `x-stalier-cache-control` for requests and `cache-control` for responses at the same time.
-
-- [INSTALL](#install)
-- [USAGE](#usage)
+  
+**Table of contents**  
+- [Install](#install)
+- [Usage : backend](#usage--backend)
   - [Express](#express)
     - [Stalier Options](#stalier-options)
     - [Handle per user caching](#handle-per-user-caching)
@@ -38,10 +39,10 @@ This means that instead of your backend sending `Cache-Control` header to your b
     - [Create a Cache instance for StalierInterceptor](#create-a-cache-instance-for-stalierinterceptor)
     - [Options for StalierModule](#options-for-staliermodule)
     - [StalierInterceptor](#stalierinterceptor)
-- [Header `x-stalier-cache-control` params](#header-x-stalier-cache-control-params)
-- [Example](#example)
+- [Usage : frontend](#usage--frontend)
+  - [Example](#example)
 
-## INSTALL
+## Install
 
 ```bash
 npm install stalier
@@ -52,7 +53,7 @@ or
 ```bash
 yarn add stalier
 ```
-## USAGE
+## Usage : backend
 
 ### Express
 
@@ -230,15 +231,15 @@ class MyAppController {
 By default, stalier interceptor will use the request path as the cache key.  
 To handle per user caching, you can use the `CacheKeyUser` decorator. You can apply it per controller or per method.  
 To apply a static key, use the `CacheKey` decorator. Or to have fine grained control, you can use the `CacheKeyGen` decorator.
-## Header `x-stalier-cache-control` params
+## Usage : frontend
 
-Stalier is using the `x-stalier-cache-control` header to control the cache behaviour.
+Stalier is using the `x-stalier-cache-control` header to control the cache behaviour within your frontend.
 it supports the following params:
 
 - s-maxage: time in seconds indicating the maximum time the response should be cached. A value of 0 means no caching.
 - stale-while-revalidate: time in seconds indicating the time the response should be cached while revalidating. A value of 0 means no window for revalidation and only use cached content.
 
-## Example
+### Example
 
 If you want a content to be cached for 10 seconds and have a revalidation window of 50 seconds, you can use the following headers:
 
