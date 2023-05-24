@@ -28,6 +28,14 @@
     "build": "tsc -p tsconfig.build.json",
     "test": "jest --coverage"
   },
+  "peerDependencies": {
+    "@nestjs/common": "9.x",
+    "@nestjs/core": "9.x",
+    "@nestjs/platform-express": "9.x",
+    "cache-manager": "4.x",
+    "express": "4.x",
+    "rxjs": "7.x"
+  },
   "devDependencies": {
     "@nestjs/common": "9.4.2",
     "@nestjs/core": "9.4.2",
