@@ -11,7 +11,6 @@ import { StalierModule } from 'stalier';
       cacheOptions: {
         store: 'memory',
         max: 1000,
-        ttl: 600,
       },
     }),
   ],
