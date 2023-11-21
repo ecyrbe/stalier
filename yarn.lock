@@ -818,10 +818,10 @@
     "@types/connect" "*"
     "@types/node" "*"
 
-"@types/cache-manager@4.0.3":
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/@types/cache-manager/-/cache-manager-4.0.3.tgz#1baef7fffe2c9f73ababdac21a0d9e732909be72"
-  integrity sha512-tPo2eUsvPVk/i2AU7BKy2ekSoKFOkST918GF7Qvc4IMNTRHyekEWJtWS9sBdi+DaF/4saiBkgWji5HqH3X7W8g==
+"@types/cache-manager@4.0.6":
+  version "4.0.6"
+  resolved "https://registry.yarnpkg.com/@types/cache-manager/-/cache-manager-4.0.6.tgz#3ae154034ac9fd9f9aaffd65e14d95e0a83627c2"
+  integrity sha512-8qL93MF05/xrzFm/LSPtzNEOE1eQF3VwGHAcQEylgp5hDSTe41jtFwbSYAPfyYcVa28y1vYSjIt0c1fLLUiC/Q==
 
 "@types/connect@*":
   version "3.4.35"
